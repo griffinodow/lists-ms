@@ -8,7 +8,6 @@ import {
 } from "aws-cdk-lib/aws-dynamodb";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { HostedZone } from "aws-cdk-lib/aws-route53";
 import { Construct } from "constructs";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import {
@@ -17,7 +16,6 @@ import {
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { CfnApiMapping } from "aws-cdk-lib/aws-apigatewayv2";
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class ListsMsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -151,7 +149,7 @@ export class ListsMsStack extends cdk.Stack {
     );
 
     // API Gateway
-    const api = new RestApi(this, "Token API", {
+    const api = new RestApi(this, "ListsGw", {
       endpointTypes: [EndpointType.REGIONAL],
     });
     api.root.addMethod("GET", new LambdaIntegration(handleReadAllList));
@@ -165,7 +163,7 @@ export class ListsMsStack extends cdk.Stack {
     task.addMethod("PUT", new LambdaIntegration(handleUpdateTask));
     task.addMethod("DELETE", new LambdaIntegration(handleDeleteTask));
 
-    new CfnApiMapping(this, `lists-path-mapping`, {
+    new CfnApiMapping(this, `ListsMsPathMapping`, {
       apiId: api.restApiId,
       domainName: subdomain,
       stage: api.deploymentStage.stageName,
